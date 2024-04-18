@@ -1,4 +1,5 @@
 import cv2
+import argparse
 
 def StreamVideo(video_path):
     # Open the video file
@@ -25,3 +26,13 @@ def StreamVideo(video_path):
     # Destroy all the windows
     cv2.destroyAllWindows()
 
+def main():
+    parser = argparse.ArgumentParser(description="Run script with video path")
+    parser.add_argument("--video_path", "-i", help="Input path to mp4 video")
+    args = parser.parse_args()
+
+    StreamVideo(args.video_path)
+
+
+if __name__=="__main__":
+    main()
