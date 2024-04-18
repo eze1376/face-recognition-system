@@ -11,10 +11,23 @@ pip install -r requirements
 To run face recognition task, run the below code in Terminal:
 
 ```
-python main.py --video_path [video path]
+python main.py --video_path [video path] --detector_backend [detector]
 ```
-----
+
+detector : [
+  'opencv', 
+  'ssd', 
+  'dlib', 
+  'mtcnn', 
+  'fastmtcnn',
+  'retinaface', 
+  'mediapipe',
+  'yolov8',
+  'yunet',
+  'centerface',
+]
 ### Face detection
+----
 
 Benchmark on Laptop CPU: Intel Core i7-12650H, GPU : NVIDIA RTX 3070
 
@@ -37,3 +50,4 @@ Although `mean detection in each frame` isn't a good metric to evaluate detectio
 It's obvious that **YoloV8** has a good trade-off between speed and accuracy!
 
 ### Face Recognition
+---
