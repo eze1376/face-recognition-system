@@ -10,9 +10,14 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["--video_path", "E:\\Work\\DideNegarHooshNo\\AI_Task\\AI_Task\\files\\task-video.mp4",
-                     "--database_path", "E:\\Work\\DideNegarHooshNo\\AI_Task\\AI_Task\\files\\Dataset",
-                     "--detector_backend", "yolov8"],
+            "args": [
+                "--video_path", "E:\\Work\\DideNegarHooshNo\\AI_Task\\AI_Task\\files\\task-video.mp4",
+                "--database_path", "E:\\Work\\DideNegarHooshNo\\AI_Task\\AI_Task\\files\\Dataset",
+                "--detector_backend", "yolov8",
+                "--distance_metric", "cosine",
+                "--recognition_model", "DeepID",
+                "--recongition_detector_backend", "opencv",
+                "--threshold", "1"],
             "justMyCode": false
         }
     ]
