@@ -1,7 +1,7 @@
 import cv2
 import argparse
 from deepface import DeepFace
-
+import os
 
 def DrawFaces(frame, face_objs, show):
     """draw given faces on the input frame and show it
@@ -9,7 +9,7 @@ def DrawFaces(frame, face_objs, show):
     Args:
         frame (ndarray): input frame to show with faces
         face_objs (list): list of dictionaries that contain face information
-        show (bool): show result frame or not
+        show (bool): whether show result frame or not
 
     Returns:
         ndarray: result frame with rectangles around faces
@@ -20,7 +20,7 @@ def DrawFaces(frame, face_objs, show):
     if isinstance(face_objs, list) and len(face_objs) > 0:
       for i in range(len(face_objs)):
         
-        # Extract face from frame
+        # Extract face coordinates in the frame
         x1 = face_objs[i]['facial_area']['x']
         y1 = face_objs[i]['facial_area']['y']
         x2 = x1 + face_objs[i]['facial_area']['w']
@@ -44,6 +44,60 @@ def DrawFaces(frame, face_objs, show):
     if show:
         cv2.imshow("Frame", image)
     
+    return image
+
+
+def DrawRecognized(frame, face_objs, obj_distances, show):
+    """Draw recognized faces with their distances on the input frame and show it
+
+    Args:
+        frame (ndarray): input frame to show with recognized faces
+        face_objs (list): list of dictionaries that contain face information
+        obj_distances (list): list of distances of each face to its recognized face in database
+        show (bool): whether show result frame or not
+    """
+    image = frame.copy()
+    
+    if isinstance(face_objs, list) and len(face_objs) > 0:
+      for i in range(len(obj_distances)):
+
+        if not obj_distances[i].empty:
+
+          # Extract face coordinates in the frame  
+          x1 = face_objs[i]['facial_area']['x']
+          y1 = face_objs[i]['facial_area']['y']
+          x2 = x1 + face_objs[i]['facial_area']['w']
+          y2 = y1 + face_objs[i]['facial_area']['h']
+
+          # represents the top left corner of rectangle
+          start_point = (x1, y1)
+
+          # represents the bottom right corner of rectangle 
+          end_point = (x2, y2) 
+
+          # Green color in BGR 
+          color = (0, 255, 0)
+
+          # Line thickness of 2 px 
+          thickness = 2
+
+          # Draw a rectangle with blue line borders of thickness of 2 px 
+          image = cv2.rectangle(image, start_point, end_point, color, thickness) 
+
+          # Font 
+          font = cv2.FONT_HERSHEY_SIMPLEX 
+          
+          # Create face message with its distances to recognized face in database and name of that recognized face
+          message = str(round(obj_distances[i]['distance'].values[0], 3)) + " " +\
+          os.path.basename(obj_distances[i]['identity'].values[0])
+
+          # Put text above bounding box
+          image = cv2.putText(image, message, (x1, y1 - 10), font,  
+                     0.5, color, thickness, cv2.LINE_AA)
+
+    if show:
+        cv2.imshow("Frame", image)
+        
     return image
 
 def StreamVideo(args):
