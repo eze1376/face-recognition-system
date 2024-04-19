@@ -11,7 +11,9 @@ pip install -r requirements
 To run face recognition task, run the below code in Terminal:
 
 ```
-python main.py --video_path [video path] --detector_backend [detector]
+main.py [-h] --video_path VIDEO_PATH --database_path DATABASE_PATH [--detector_backend DETECTOR]                             
+               [--recongition_detector_backend DETECTOR] [--distance_metric METRIC]
+               [--recognition_model MODEL] [--threshold THRESHOLD]
 ```
 
 detector : [
@@ -26,6 +28,28 @@ detector : [
   'yunet',
   'centerface',
 ]
+
+metric = ["cosine", "euclidean", "euclidean_l2"]
+
+model = [
+  "VGG-Face", 
+  "Facenet", 
+  "Facenet512", 
+  "OpenFace", 
+  "DeepFace", 
+  "DeepID", 
+  "ArcFace", 
+  "Dlib", 
+  "SFace",
+  "GhostFaceNet",
+]
+
+#### Example
+
+```
+python .\main.py --video_path "E:\Work\DideNegarHooshNo\AI_Task\AI_Task\files\task-video.mp4" --database_path "E:\Work\DideNegarHooshNo\AI_Task\AI_Task\files\Dataset" --detector_backend "yolov8" --distance_metric cosine --recognition_model "DeepID" --threshold 1 --recongition_detector_backend opencv
+```
+
 ### Face detection
 ----
 
