@@ -51,3 +51,17 @@ It's obvious that **YoloV8** has a good trade-off between speed and accuracy!
 
 ### Face Recognition
 ---
+After using **YoloV8** for face detection we use different methods for face recognition and here is the results:
+
+| Algorithm    | Threshold `metrics (cosine/euclidean/euclidean_l2)`
+| --------   | :-------:
+|VGG-Face    | -/1.2/1.2 ❌
+|Facenet     | -/2.3/0.5 ❌
+|Facenet512  | -/20/0.9 ❔
+|OpenFace    | 0.25/1/0.95 ❔
+|DeepFace    | -/-/0.9 ❔
+|DeepID      | 0.07✅/110❔/0.4✅
+|ArcFace     | 0.6/4/1.1 ❔
+|Dlib        | 0.5/0.55/0.33 ❌
+|SFace       | 0.6✅/10/1.2❔
+|GhostFaceNet| 0.6❔/36❌/1.1❔
