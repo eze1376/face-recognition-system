@@ -3,6 +3,7 @@ import argparse
 from deepface import DeepFace
 import os
 import logging
+import time
 
 def DrawFaces(frame, face_objs, show):
     """draw given faces on the input frame and show it
@@ -122,13 +123,16 @@ def StreamVideo(args):
         if not ret:
             break
         
+        # Log frame time
+        frame_time = video.get(cv2.CAP_PROP_POS_MSEC)
+        logging.info("Frame time: " + str(frame_time) + "ms")
+        
         # Call Face Detection Service
         isRecognized = FaceDetection(frame, args)
         
         # Save to Log
         if isRecognized:
-            frame_time = video.get(cv2.CAP_PROP_POS_MSEC)
-            logging.info("Person Recognized @ " + str(frame_time) + "ms")
+            logging.info("[Person Recognized]")
 
         # Press 'q' on the keyboard to exit
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -148,12 +152,15 @@ def FaceDetection(frame, args):
         args (args): user input arguments
     """
     try:
-     face_objs = DeepFace.extract_faces(img_path = frame,
-                                        detector_backend = args.detector_backend
-     )
-     
-     if isinstance(face_objs, list) and len(face_objs) > 0:
-        return FaceRecognition(frame, face_objs, args)
+    
+        tic = time.time()
+        face_objs = DeepFace.extract_faces(img_path = frame, detector_backend = args.detector_backend)
+        toc = time.time()
+        
+        logging.info(f"Face Detection ({args.detector_backend}) in {round(toc-tic, 3)}s")
+        
+        if isinstance(face_objs, list) and len(face_objs) > 0:
+            return FaceRecognition(frame, face_objs, args)
     except:
         print("No Detection")
         face_objs = 0
@@ -170,31 +177,42 @@ def FaceRecognition(frame, faces, args):
         args (args): user input arguments
     """
     differences = []
+    time_elapsed = []
     
     for i in range(len(faces)):
         
-      # Extract face from frame
-      x1 = faces[i]['facial_area']['x']
-      y1 = faces[i]['facial_area']['y']
-      x2 = x1 + faces[i]['facial_area']['w']
-      y2 = y1 + faces[i]['facial_area']['h']
+        # Extract face from frame
+        x1 = faces[i]['facial_area']['x']
+        y1 = faces[i]['facial_area']['y']
+        x2 = x1 + faces[i]['facial_area']['w']
+        y2 = y1 + faces[i]['facial_area']['h']
+        
+        face_img = frame[y1:y2, x1:x2, :]   
+        
+        # Face recognition
+        tic = time.time()
+        difference = DeepFace.find(img_path = face_img, 
+                  db_path = args.database_path,
+                  detector_backend=args.recongition_detector_backend,
+                  distance_metric = args.distance_metric, 
+                  model_name = args.recognition_model,
+                  threshold = args.threshold,
+                  enforce_detection=False,
+                  silent= True
+        )
+        toc = time.time()
+        
+        time_elapsed.append(str(round(toc-tic, 3)))
 
-      face_img = frame[y1:y2, x1:x2, :]
+        if isinstance(difference, list) and len(difference) > 0:
+            differences.append(difference[0])
 
-      # Face recognition
-      difference = DeepFace.find(img_path = face_img, 
-                db_path = args.database_path,
-                detector_backend=args.recongition_detector_backend,
-                distance_metric = args.distance_metric, 
-                model_name = args.recognition_model,
-                threshold = args.threshold,
-                enforce_detection=False,
-                silent= True
-      )
-      
-      if isinstance(difference, list) and len(difference) > 0:
-          differences.append(difference[0])
 
+    # Log recognition times
+    time_elapsed_msg = "s ".join(time_elapsed)
+    logging.info(f"Recognition {len(faces)} faces in {time_elapsed_msg}s")
+
+    # Draw recognized faces
     frame_with_faces = DrawFaces(frame, faces, False)
     DrawRecognized(frame_with_faces, faces, differences, True)
     
