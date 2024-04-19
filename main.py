@@ -24,7 +24,7 @@ def StreamVideo(args):
             break
         
         # Call Face Detection Service
-        FaceDetection(frame, args.detector_backend)
+        FaceDetection(frame, args)
 
         # Press 'q' on the keyboard to exit
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -36,26 +36,65 @@ def StreamVideo(args):
     # Destroy all the windows
     cv2.destroyAllWindows()
 
-def FaceDetection(frame, backend):
+def FaceDetection(frame, args):
     """detect faces in the frame
 
     Args:
         frame (ndarray): an input frame to detect faces
-        backend (str): model name to use for detection
+        args (args): user input arguments
     """
     try:
      face_objs = DeepFace.extract_faces(img_path = frame,
-                                        detector_backend = backend
+                                        detector_backend = args.detector_backend
      )
+     
+     if isinstance(face_objs, list) and len(face_objs) > 0:
+        FaceRecognition(frame, face_objs, args)
     except:
         print("No Detection")
         face_objs = 0
         
 
+def FaceRecognition(frame, faces, args):
+    """recognize detected faces with matching them to the database faces
+
+    Args:
+        frame (ndarray): current frame to recognize faces of it
+        faces (list): list of a dictionary which contain detected face information
+        args (args): user input arguments
+    """
+    
+    for i in range(len(faces)):
+        
+      # Extract face from frame
+      x1 = faces[i]['facial_area']['x']
+      y1 = faces[i]['facial_area']['y']
+      x2 = x1 + faces[i]['facial_area']['w']
+      y2 = y1 + faces[i]['facial_area']['h']
+
+      face_img = frame[y1:y2, x1:x2, :]
+
+      # Face recognition
+      dfs = DeepFace.find(img_path = face_img, 
+                db_path = args.database_path,
+                detector_backend=args.detector_backend,
+                distance_metric = args.distance_metric, 
+                model_name = args.recognition_model,
+                threshold = args.threshold,
+                enforce_detection=False
+      )
+        
+
 def main():
     parser = argparse.ArgumentParser(description="Run script with video path")
-    parser.add_argument("--video_path", "-vp", help="Input path to mp4 video")
-    parser.add_argument("--detector_backend", "-db", help="Backend model of face detection [opencv | ssd | dlib | mtcnn | fastmtcnn | retinaface | mediapipe | yolov8 | yunet | centerface]")
+    parser.add_argument("--video_path", "-vp", help="Input path to mp4 video", type=str, required=True)
+    parser.add_argument("--database_path", "-db", help="Path to the face database", type=str, required=True)
+    parser.add_argument("--detector_backend", "-b", help="Backend model of face detection [opencv | ssd | dlib | mtcnn | fastmtcnn | retinaface | mediapipe | yolov8 | yunet | centerface]", type=str)
+    parser.add_argument("--distance_metric", "-dm", help="Distance metric for face recognition [cosine | euclidean | euclidean_l2]", type=str)
+    parser.add_argument("--recognition_model", "-rm", help="Model name for face recognition [VGG-Face | Facenet | Facenet512 | OpenFace | DeepFace | DeepID | ArcFace | Dlib | SFace | GhostFaceNet]", type=str)
+    parser.add_argument("--threshold", "-th", help="Threshold for distance of face recognition", type=float)
+    
+    
     args = parser.parse_args()
 
     backends = [
@@ -70,9 +109,28 @@ def main():
   'yunet',
   'centerface',
 ]
+    
+    metrics = ["cosine", "euclidean", "euclidean_l2"]
+    
+    models = [
+  "VGG-Face", 
+  "Facenet", 
+  "Facenet512", 
+  "OpenFace", 
+  "DeepFace", 
+  "DeepID", 
+  "ArcFace", 
+  "Dlib", 
+  "SFace",
+  "GhostFaceNet",
+]
 
     if not args.detector_backend in backends:
-        args.detector_backend = None
+        args.detector_backend = 'opencv'
+    if not args.distance_metric in metrics:
+        args.distance_metric = 'cosine'
+    if not args.recognition_model in models:
+        args.recognition_model = 'VGG-Face'
     
     
     StreamVideo(args)
