@@ -2,6 +2,50 @@ import cv2
 import argparse
 from deepface import DeepFace
 
+
+def DrawFaces(frame, face_objs, show):
+    """draw given faces on the input frame and show it
+
+    Args:
+        frame (ndarray): input frame to show with faces
+        face_objs (list): list of dictionaries that contain face information
+        show (bool): show result frame or not
+
+    Returns:
+        ndarray: result frame with rectangles around faces
+    """
+    
+    image = frame.copy()
+
+    if isinstance(face_objs, list) and len(face_objs) > 0:
+      for i in range(len(face_objs)):
+        
+        # Extract face from frame
+        x1 = face_objs[i]['facial_area']['x']
+        y1 = face_objs[i]['facial_area']['y']
+        x2 = x1 + face_objs[i]['facial_area']['w']
+        y2 = y1 + face_objs[i]['facial_area']['h']
+
+        # represents the top left corner of rectangle
+        start_point = (x1, y1)
+
+        # represents the bottom right corner of rectangle 
+        end_point = (x2, y2) 
+
+        # Blue color in BGR
+        color = (255, 0, 0) 
+
+        # Line thickness of 2 px 
+        thickness = 2
+
+        # Draw a rectangle with blue line borders of thickness of 2 px 
+        image = cv2.rectangle(image, start_point, end_point, color, thickness) 
+        
+    if show:
+        cv2.imshow("Frame", image)
+    
+    return image
+
 def StreamVideo(args):
     """stream video
 
