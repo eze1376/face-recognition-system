@@ -2,6 +2,7 @@ import cv2
 import argparse
 from deepface import DeepFace
 import os
+import logging
 
 def DrawFaces(frame, face_objs, show):
     """draw given faces on the input frame and show it
@@ -122,7 +123,12 @@ def StreamVideo(args):
             break
         
         # Call Face Detection Service
-        FaceDetection(frame, args)
+        isRecognized = FaceDetection(frame, args)
+        
+        # Save to Log
+        if isRecognized:
+            frame_time = video.get(cv2.CAP_PROP_POS_MSEC)
+            logging.info("Person Recognized @ " + str(frame_time) + "ms")
 
         # Press 'q' on the keyboard to exit
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -147,10 +153,12 @@ def FaceDetection(frame, args):
      )
      
      if isinstance(face_objs, list) and len(face_objs) > 0:
-        FaceRecognition(frame, face_objs, args)
+        return FaceRecognition(frame, face_objs, args)
     except:
         print("No Detection")
         face_objs = 0
+        return False
+    
         
 
 def FaceRecognition(frame, faces, args):
@@ -161,7 +169,7 @@ def FaceRecognition(frame, faces, args):
         faces (list): list of a dictionary which contain detected face information
         args (args): user input arguments
     """
-    dfs_list = []
+    differences = []
     
     for i in range(len(faces)):
         
@@ -174,20 +182,28 @@ def FaceRecognition(frame, faces, args):
       face_img = frame[y1:y2, x1:x2, :]
 
       # Face recognition
-      dfs = DeepFace.find(img_path = face_img, 
+      difference = DeepFace.find(img_path = face_img, 
                 db_path = args.database_path,
                 detector_backend=args.recongition_detector_backend,
                 distance_metric = args.distance_metric, 
                 model_name = args.recognition_model,
                 threshold = args.threshold,
-                enforce_detection=False
+                enforce_detection=False,
+                silent= True
       )
       
-      if isinstance(dfs, list) and len(dfs) > 0:
-          dfs_list.append(dfs[0])
+      if isinstance(difference, list) and len(difference) > 0:
+          differences.append(difference[0])
 
     frame_with_faces = DrawFaces(frame, faces, False)
-    DrawRecognized(frame_with_faces, faces, dfs_list, True)
+    DrawRecognized(frame_with_faces, faces, differences, True)
+    
+    recognized = [diff for diff in differences if not diff.empty]
+    if len(recognized) > 0:
+        # Person recognized
+        return True
+    else:
+        return False
       
         
 
@@ -241,6 +257,8 @@ def main():
     if not args.recongition_detector_backend in backends:
         args.recongition_detector_backend = 'opencv'
     
+    # Logging config
+    logging.basicConfig(filename="logs.log", level=logging.INFO, filemode="w", format="%(levelname)s - %(message)s")
     
     StreamVideo(args)
 
