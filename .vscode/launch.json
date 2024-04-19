@@ -10,7 +10,10 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["--video_path","E:\\Work\\DideNegarHooshNo\\AI_Task\\AI_Task\\files\\task-video.mp4"]
+            "args": ["--video_path", "E:\\Work\\DideNegarHooshNo\\AI_Task\\AI_Task\\files\\task-video.mp4",
+                     "--database_path", "E:\\Work\\DideNegarHooshNo\\AI_Task\\AI_Task\\files\\Dataset",
+                     "--detector_backend", "yolov8"],
+            "justMyCode": false
         }
     ]
 }
