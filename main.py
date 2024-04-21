@@ -5,7 +5,7 @@ import os
 import logging
 import time
 
-def DrawFaces(frame, face_objs, show):
+def draw_faces(frame, face_objs, show):
     """draw given faces on the input frame and show it
 
     Args:
@@ -49,7 +49,7 @@ def DrawFaces(frame, face_objs, show):
     return image
 
 
-def DrawRecognized(frame, face_objs, obj_distances, show):
+def draw_recognized(frame, face_objs, obj_distances, show):
     """Draw recognized faces with their distances on the input frame and show it
 
     Args:
@@ -102,7 +102,7 @@ def DrawRecognized(frame, face_objs, obj_distances, show):
         
     return image
 
-def StreamVideo(args):
+def stream_video(args):
     """stream video
 
     Args:
@@ -128,7 +128,7 @@ def StreamVideo(args):
         logging.info("Frame time: " + str(frame_time) + "ms")
         
         # Call Face Detection Service
-        isRecognized = FaceDetection(frame, args)
+        isRecognized = face_detection(frame, args)
         
         # Save to Log
         if isRecognized:
@@ -144,7 +144,7 @@ def StreamVideo(args):
     # Destroy all the windows
     cv2.destroyAllWindows()
 
-def FaceDetection(frame, args):
+def face_detection(frame, args):
     """detect faces in the frame
 
     Args:
@@ -160,7 +160,7 @@ def FaceDetection(frame, args):
         logging.info(f"Face Detection ({args.detector_backend}) in {round(toc-tic, 3)}s")
         
         if isinstance(face_objs, list) and len(face_objs) > 0:
-            return FaceRecognition(frame, face_objs, args)
+            return face_recognition(frame, face_objs, args)
     except:
         print("No Detection")
         face_objs = 0
@@ -168,7 +168,7 @@ def FaceDetection(frame, args):
     
         
 
-def FaceRecognition(frame, faces, args):
+def face_recognition(frame, faces, args):
     """recognize detected faces with matching them to the database faces
 
     Args:
@@ -213,8 +213,8 @@ def FaceRecognition(frame, faces, args):
     logging.info(f"Recognition {len(faces)} faces in {time_elapsed_msg}s")
 
     # Draw recognized faces
-    frame_with_faces = DrawFaces(frame, faces, False)
-    DrawRecognized(frame_with_faces, faces, differences, True)
+    frame_with_faces = draw_faces(frame, faces, False)
+    draw_recognized(frame_with_faces, faces, differences, True)
     
     recognized = [diff for diff in differences if not diff.empty]
     if len(recognized) > 0:
@@ -278,7 +278,7 @@ def main():
     # Logging config
     logging.basicConfig(filename="logs.log", level=logging.INFO, filemode="w", format="%(levelname)s - %(message)s")
     
-    StreamVideo(args)
+    stream_video(args)
 
 
 if __name__=="__main__":
