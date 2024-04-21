@@ -89,3 +89,11 @@ After using **YoloV8** for face detection we use different methods for face reco
 |Dlib        | 0.5/0.55/0.33 ❌
 |SFace       | 0.6✅/10/1.2❔
 |GhostFaceNet| 0.6❔/36❌/1.1❔
+
+
+### Combination
+----
+
+| Detection | Recognition | Normalization | Threshold
+| ---------| -----------|------------|-------------
+| YoloV8   | VGG-Face   | VGGFace | 1.2
