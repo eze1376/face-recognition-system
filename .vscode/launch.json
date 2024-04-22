@@ -11,13 +11,13 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                "--video_path", "E:\\Work\\DideNegarHooshNo\\AI_Task\\AI_Task\\files\\task-video.mp4",
-                "--database_path", "E:\\Work\\DideNegarHooshNo\\AI_Task\\AI_Task\\files\\Dataset",
+                "--video_path", "/home/eze/Work/DideNegarHooshNo/Projects/FaceRecognition/Data/Test/TestCases/task-video.mp4",
+                "--database_path", "/home/eze/Work/DideNegarHooshNo/Projects/FaceRecognition/Data/Test/Database",
                 "--detector_backend", "yolov8",
                 "--distance_metric", "cosine",
                 "--recognition_model", "DeepID",
-                "--recongition_detector_backend", "opencv",
-                "--threshold", "1"],
+                "--recognition_detector_backend", "opencv",
+                "--threshold", "0.07"],
             "justMyCode": false
         }
     ]
