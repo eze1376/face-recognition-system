@@ -193,7 +193,7 @@ def face_recognition(frame, faces, args):
         tic = time.time()
         difference = DeepFace.find(img_path = face_img, 
                   db_path = args.database_path,
-                  detector_backend=args.recongition_detector_backend,
+                  detector_backend=args.recognition_detector_backend,
                   distance_metric = args.distance_metric, 
                   model_name = args.recognition_model,
                   threshold = args.threshold,
@@ -230,7 +230,7 @@ def main():
     parser.add_argument("--video_path", "-vp", help="Input path to mp4 video", type=str, required=True)
     parser.add_argument("--database_path", "-db", help="Path to the face database", type=str, required=True)
     parser.add_argument("--detector_backend", "-b", help="Backend model of face detection [opencv | ssd | dlib | mtcnn | fastmtcnn | retinaface | mediapipe | yolov8 | yunet | centerface]", type=str)
-    parser.add_argument("--recongition_detector_backend", "-rb", help="Backend model of face detection in recognition phase [opencv | ssd | dlib | mtcnn | fastmtcnn | retinaface | mediapipe | yolov8 | yunet | centerface]", type=str)
+    parser.add_argument("--recognition_detector_backend", "-rb", help="Backend model of face detection in recognition phase [opencv | ssd | dlib | mtcnn | fastmtcnn | retinaface | mediapipe | yolov8 | yunet | centerface]", type=str)
     parser.add_argument("--distance_metric", "-dm", help="Distance metric for face recognition [cosine | euclidean | euclidean_l2]", type=str)
     parser.add_argument("--recognition_model", "-rm", help="Model name for face recognition [VGG-Face | Facenet | Facenet512 | OpenFace | DeepFace | DeepID | ArcFace | Dlib | SFace | GhostFaceNet]", type=str)
     parser.add_argument("--threshold", "-th", help="Threshold for distance of face recognition", type=float)
@@ -272,8 +272,8 @@ def main():
         args.distance_metric = 'cosine'
     if not args.recognition_model in models:
         args.recognition_model = 'VGG-Face'
-    if not args.recongition_detector_backend in backends:
-        args.recongition_detector_backend = 'opencv'
+    if not args.recognition_detector_backend in backends:
+        args.recognition_detector_backend = 'opencv'
     
     # Logging config
     logging.basicConfig(filename="logs.log", level=logging.INFO, filemode="w", format="%(levelname)s - %(message)s")
